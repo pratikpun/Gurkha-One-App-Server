@@ -1,4 +1,4 @@
-# Awesome Project Build with TypeORM
+# Gurkha One App server
 
 Steps to run this project:
 
