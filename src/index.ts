@@ -4,6 +4,7 @@ import { createOrmConnection } from "./database/typeormconfig";
 import { User } from "./entity/User";
 const bodyParser = require("body-parser");
 const userRouter = require("./routes/user");
+const tournamentsRouter = require("./routes/tournaments");
 const express = require("express");
 
 const server = express();
@@ -12,22 +13,11 @@ server.use(bodyParser.urlencoded({ extended: false }));
 server.use(express.json());
 
 server.use("/", userRouter);
+server.use("/", tournamentsRouter);
 
 createOrmConnection()
   .then(() => {
     console.log("Successfully connected to database(workbench)!");
-    // console.log("Inserting a new user into the database...");
-    // const user = new User();
-    // //auto generated from mysql workbench
-    // //user.userID = 1;
-    // user.firstName = "Another";
-    // user.email = "test2";
-    // user.password = "10";
-    // await connection.manager.save(user);
-    // console.log("Loading users from the database...");
-    // const users = await connection.manager.find(User);
-    // console.log("Loaded users: ", users);
-    // console.log("Here you can setup and run express/koa/any other framework.");
     server.listen(9000, () => {
       console.log("Listening to port: 9000(in the api)");
     });

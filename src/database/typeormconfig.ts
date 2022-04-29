@@ -7,7 +7,7 @@ export const createOrmConnection = async () => {
     port: 3306,
     username: "root",
     password: "password",
-    database: "sampleData",
+    database: "GurkhaServer",
     synchronize: false,
     logging: false,
     entities: ["src/entity/**/*.ts"],

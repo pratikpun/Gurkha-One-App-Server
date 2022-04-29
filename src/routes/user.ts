@@ -1,7 +1,8 @@
-import { getRepository } from "typeorm";
+import { getRepository, SimpleConsoleLogger } from "typeorm";
 import { User } from "../entity/User";
-import { Teams } from "../entity/Teams";
+import { Team } from "../entity/Team";
 import bcrypt from "bcrypt";
+import { FavouriteTeam } from "../entity/FavouriteTeam";
 const authCheck = require("../authCheck");
 const express = require("express");
 const router = express.Router();
@@ -40,7 +41,7 @@ router.post("/api/login", async (req, res, error) => {
 
   // logic for login, any error will cause data to be undefined.
   if (data === undefined) {
-    // console.log("User not found!");
+    //fix login logic here
     res.send({
       data: {
         success: false,
@@ -57,7 +58,9 @@ router.post("/api/login", async (req, res, error) => {
     console.log(validPassword);
     //comapre data.email and validPassword then log in
     if (data.email && validPassword) {
+      const loginDate = new Date();
       //console.log("Successfully Logged in");
+      // token is generated after successful login
       const token = jwt.sign(
         {
           userEmail: data.email,
@@ -68,8 +71,20 @@ router.post("/api/login", async (req, res, error) => {
       res.send({
         data: {
           token: token,
+          date: loginDate,
           success: true,
           msg: "Successfully logged in!",
+          userID: data.userID,
+          firstName: data.firstName,
+          email: data.email,
+        },
+      });
+      //console.log(data);
+      return;
+    } else {
+      res.send({
+        data: {
+          success: false,
         },
       });
       return;
@@ -96,14 +111,12 @@ router.post("/api/register", async (req, res) => {
   user.firstName = req.body.firstName;
   user.email = req.body.email;
   user.password = hashPassword;
-  //console.log(hashPasswordString);
 
   // get userData in the User database
   const userData = getRepository(User);
 
   // Logic for checking if email already exists in database
   const userEmail = await userData.findOne({ email: user.email });
-  console.log(userEmail);
 
   if (!userEmail) {
     const savedData = await userData.save(user);
@@ -128,8 +141,36 @@ router.post("/api/register", async (req, res) => {
 });
 
 router.get("/api/dashboard", authCheck, async (req, res, error) => {
-  const data = await getRepository(Teams).find();
+  const data = await getRepository(Team).find();
   res.send(data);
+});
+
+// router.get("/api/favourite/team", async (req, res, error) => {
+//   const user = await getRepository(FavouriteTeam)
+//     .createQueryBuilder("favouriteTeam")
+//     .leftJoinAndSelect("favouriteTeam", "user")
+//     .where("favouriteTeam.userID = :userID", { userID: 92 })
+//     .getOne();
+//   console.log("hello");
+//   console.log(user);
+//   res.send(user);
+// });
+
+router.put("/api/editProfile", async (req, res, error) => {
+  const userID = req.body.userID;
+  const name = req.body.name;
+  const email = req.body.email;
+  const userDetails = await getRepository(User).findOne({
+    userID: userID,
+  });
+
+  console.log(userDetails);
+  userDetails.email = email;
+  userDetails.firstName = name;
+
+  await getRepository(User).save(userDetails);
+
+  res.send(userDetails);
 });
 
 module.exports = router;

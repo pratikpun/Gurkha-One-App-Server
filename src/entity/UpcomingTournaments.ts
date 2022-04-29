@@ -1,16 +1,19 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
-export class Teams {
+export class UpcomingTournaments {
   @PrimaryGeneratedColumn()
-  teamID: number;
+  id: number;
 
   @Column()
-  teamName: string;
+  utName: string;
 
   @Column()
-  teamColor: string;
+  utDate: string;
 
   @Column()
-  teamScore: string;
+  utVenue: string;
+
+  @Column()
+  utDesc: string;
 }
