@@ -7,6 +7,8 @@ const authCheck = require("../authCheck");
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const nodemailer = require("nodemailer");
 
 const saltRounds = 10;
 
@@ -79,6 +81,7 @@ router.post("/api/login", async (req, res, error) => {
           email: data.email,
         },
       });
+
       //console.log(data);
       return;
     } else {
@@ -96,12 +99,24 @@ router.post("/api/login", async (req, res, error) => {
 
 // register user
 router.post("/api/register", async (req, res) => {
-  // const user = {
-  //   firstName: req.body.firstName,
-  //   email: req.body.email,
-  //   password: req.body.password,
-  //   confirmPassword: req.body.confirmPassword,
-  // };
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD,
+      // user: "gurkhaone1@gmail.com",
+      // pass: "gurkha2022",
+    },
+  });
+  console.log(process.env.EMAIL);
+  console.log(process.env.PASSWORD);
+
+  let EmailDetails = {
+    from: `Gurkha One`,
+    to: req.body.email,
+    subject: "Successful Registration with Gurkha One!",
+    html: `<h2>Hello, ${req.body.firstName}! </h2> <br /> <p> Thank you for registering with Gurkha One. We are happy to have you on board 😁. </p> <br /> <p>Please go back to the app to log in!</p> <br /> <p>Gurkha One Team ❤️!</p>`,
+  };
 
   let user = new User();
   // hash and salt the password
@@ -111,7 +126,6 @@ router.post("/api/register", async (req, res) => {
   user.firstName = req.body.firstName;
   user.email = req.body.email;
   user.password = hashPassword;
-
   // get userData in the User database
   const userData = getRepository(User);
 
@@ -120,6 +134,13 @@ router.post("/api/register", async (req, res) => {
 
   if (!userEmail) {
     const savedData = await userData.save(user);
+    await transporter.sendMail(EmailDetails, (err) => {
+      if (err) {
+        console.log("Email not sent: ", err);
+      } else {
+        console.log("Email sent successfully!");
+      }
+    });
     res.send({
       msg: "success",
     });
