@@ -4,13 +4,14 @@ import { Team } from "../entity/Team";
 import { FavouriteTeam } from "../entity/FavouriteTeam";
 import { UpcomingTournaments } from "../entity/UpcomingTournaments";
 import { User } from "../entity/User";
+const authCheck = require("../authCheck");
 
 const express = require("express");
 const router = express.Router();
 //const authCheck = require("../authCheck");
 //const jwt = require("jsonwebtoken");
 
-router.get("/api/tournaments", async (req, res, error) => {
+router.get("/api/tournaments", authCheck, async (req, res, error) => {
   const data = await getRepository(Tournaments).find();
   //res.send("Hello sent");
   res.send(data);
@@ -22,7 +23,7 @@ router.post("/api/tournaments", async (req, res, error) => {
   res.send(data);
 });
 
-router.get("/api/teams", async (req, res, error) => {
+router.get("/api/teams", authCheck, async (req, res, error) => {
   const data = await getRepository(Team).find();
   //res.send("Hello sent");
   res.send(data);
@@ -48,7 +49,7 @@ router.post("/api/favourites", async (req, res, error) => {
   res.send("Successfully saved");
 });
 
-router.get("/api/favourites/:userID", async (req, res, error) => {
+router.get("/api/favourites/:userID", authCheck, async (req, res, error) => {
   const userID = req.params.userID;
   //console.log(userID);
   const data = await getRepository(FavouriteTeam).find({ userID: userID });
@@ -69,7 +70,7 @@ router.delete("/api/favourites/:userID/:teamName", async (req, res, error) => {
   res.send(remaningData);
 });
 
-router.get("/api/upcoming", async (req, res, error) => {
+router.get("/api/upcoming", authCheck, async (req, res, error) => {
   //const userID = req.params.userID;
   //console.log(userID);
   const data = await getRepository(UpcomingTournaments).find();

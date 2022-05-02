@@ -161,21 +161,10 @@ router.post("/api/register", async (req, res) => {
   // res.send(userInDatabase);
 });
 
-router.get("/api/dashboard", authCheck, async (req, res, error) => {
+router.get("/api/dashboard", async (req, res, error) => {
   const data = await getRepository(Team).find();
   res.send(data);
 });
-
-// router.get("/api/favourite/team", async (req, res, error) => {
-//   const user = await getRepository(FavouriteTeam)
-//     .createQueryBuilder("favouriteTeam")
-//     .leftJoinAndSelect("favouriteTeam", "user")
-//     .where("favouriteTeam.userID = :userID", { userID: 92 })
-//     .getOne();
-//   console.log("hello");
-//   console.log(user);
-//   res.send(user);
-// });
 
 router.put("/api/editProfile", async (req, res, error) => {
   const userID = req.body.userID;
@@ -191,7 +180,14 @@ router.put("/api/editProfile", async (req, res, error) => {
 
   await getRepository(User).save(userDetails);
 
-  res.send(userDetails);
+  const updatedData = await getRepository(User).findOne({
+    userID: userID,
+  });
+
+  res.send({
+    msg: "success",
+    data: updatedData,
+  });
 });
 
 module.exports = router;
